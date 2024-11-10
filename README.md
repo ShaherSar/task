@@ -14,3 +14,5 @@ create s3 bucket called "my-bucket"
 everything should be working now ..
 
 visit http://localhost/horizon/ to monitor the queues running ..
+
+postman collection :: postman_collection.json
