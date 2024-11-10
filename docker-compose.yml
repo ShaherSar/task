@@ -9,7 +9,7 @@ services:
     working_dir: /var/www/html
     networks:
       - laravel_network
-    command: '/bin/bash -c "sleep 5 && php artisan migrate && php artisan db:seed && php-fpm"'
+    command: '/bin/bash -c "sleep 10 && php artisan migrate && php artisan db:seed && php-fpm"'
     depends_on:
         - db
         - redis
@@ -32,7 +32,7 @@ services:
         - minio
         - redis
         - rabbitmq_management
-    command: '/bin/bash -c "sleep 5 && php artisan horizon"'
+    command: '/bin/bash -c "sleep 10 && php artisan horizon"'
 
   nginx:
     image: nginx:latest
