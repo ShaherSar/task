@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
     unzip
 
 RUN apt-get update && \
-    apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev && \
-    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libavif-dev && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-avif && \
     docker-php-ext-install gd
 
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath sockets

@@ -16,7 +16,8 @@ class ProcessImageJob implements ShouldQueue
     public function __construct(
         protected int    $userId,
         protected string $imageName,
-        protected string $uploadedImagePath
+        protected string $uploadedImagePath,
+        protected array $sizes
     )
     {
     }
@@ -28,17 +29,13 @@ class ProcessImageJob implements ShouldQueue
 
     public function handle(): void
     {
-        $image = app(ImageManager::class)->read($this->uploadedImagePath)->orient();
+        $imageData = Storage::disk('minio')->get($this->uploadedImagePath);
 
-        $sizes = [
-            'small' => 150,
-            'medium' => 300,
-            'large' => 600,
-        ];
+        $image = app(ImageManager::class)->read($imageData)->orient();
 
         $timestamp = Carbon::now()->format('Y-m-d H:i:s');
 
-        foreach ($sizes as $sizeName => $dimension) {
+        foreach ($this->sizes as $sizeName => $dimension) {
             $thumbnail = clone $image;
 
             $thumbnail->scale($dimension, $dimension)->resizeCanvas($dimension, $dimension);
@@ -50,9 +47,9 @@ class ProcessImageJob implements ShouldQueue
                 $font->valign('bottom');
             });
 
-            Storage::put("thumbnails/{$sizeName}/" . $this->imageName . ".webp", $thumbnail->toWebp());
+            Storage::disk('minio')->put("thumbnails/{$sizeName}/" . $this->imageName . ".webp", $thumbnail->toWebp());
 
-            Storage::put("thumbnails/{$sizeName}/" . $this->imageName . ".avif", $thumbnail->toAvif());
+            Storage::disk('minio')->put("thumbnails/{$sizeName}/" . $this->imageName . ".avif", $thumbnail->toAvif());
         }
     }
 }

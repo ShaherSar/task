@@ -9,10 +9,11 @@ services:
     working_dir: /var/www/html
     networks:
       - laravel_network
-    command: '/bin/bash -c "php artisan migrate && php artisan db:seed && php-fpm"'
+    command: '/bin/bash -c "sleep 5 && php artisan migrate && php artisan db:seed && php-fpm"'
     depends_on:
         - db
         - redis
+        - minio
         - rabbitmq_management
 
   horizon:
@@ -28,9 +29,10 @@ services:
     depends_on:
         - app
         - db
+        - minio
         - redis
         - rabbitmq_management
-    command: '/bin/bash -c "php artisan horizon"'
+    command: '/bin/bash -c "sleep 5 && php artisan horizon"'
 
   nginx:
     image: nginx:latest
@@ -54,8 +56,6 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
-    volumes:
-      - ./docker/database/data:/var/lib/mysql
     networks:
       - laravel_network
 
@@ -66,6 +66,19 @@ services:
       - "6379:6379"
     networks:
       - laravel_network
+
+  minio:
+      image: minio/minio
+      container_name: minio
+      environment:
+          - MINIO_ROOT_USER=admin
+          - MINIO_ROOT_PASSWORD=admin123
+      ports:
+          - "9000:9000"
+          - "9001:9001"
+      command: server /data --console-address ":9001"
+      networks:
+          - laravel_network
 
   rabbitmq_management:
     image: rabbitmq:3-management
@@ -78,6 +91,7 @@ services:
           RABBITMQ_DEFAULT_PASS: password
     networks:
         - laravel_network
+
 volumes:
     db_data:
 

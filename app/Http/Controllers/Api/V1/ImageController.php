@@ -45,12 +45,17 @@ class ImageController extends Controller
                 'metadata' => $image->exif()->toArray(),
             ]);
 
-            Storage::disk('public')->put($originalUploadPath, $image->encode());
+            Storage::disk('minio')->put($originalUploadPath, $image->encode());
 
             $job = new ProcessImageJob(
                 auth()->id(),
                 $imageName,
-                Storage::disk('public')->path($originalUploadPath)
+                Storage::disk('minio')->path($originalUploadPath),
+                [
+                    'small' => 150,
+                    'medium' => 300,
+                    'large' => 600,
+                ]
             );
 
             $job->onQueue('process_images');

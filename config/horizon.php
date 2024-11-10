@@ -182,7 +182,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'rabbitmq',
-            'queue' => ['default', 'process_images', 'process_images_dlq'],
+            'queue' => ['process_images'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,
